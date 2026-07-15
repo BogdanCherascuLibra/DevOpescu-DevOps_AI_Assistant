@@ -1,0 +1,8 @@
+[
+  {
+    "id": "infrastructure",
+    "name": "Infrastructure overview",
+    "description": "General information about servers, containers, CI/CD.",
+    "always_load": true
+  }
+]

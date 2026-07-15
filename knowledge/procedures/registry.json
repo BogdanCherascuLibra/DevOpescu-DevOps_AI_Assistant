@@ -1,0 +1,14 @@
+[
+    {
+        "id": "docker_troubleshooting",
+        "name": "Docker troubleshooting",
+        "description": "Steps for diagnosing docker problems",
+        "always_load": true
+    },
+    {
+        "id": "service_troubleshooting",
+        "name": "Service troubleshooting",
+        "description": "Steps for diagnosing service problems",
+        "always_load": true
+    }
+]
