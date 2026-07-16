@@ -1,6 +1,9 @@
 import requests
+import json
 
-from config import EMBEDDINGS_MODEL, EMBEDDINGS_ENDPOINT
+from config import (EMBEDDINGS_MODEL, EMBEDDINGS_ENDPOINT,
+                     SEMANTIC_SEARCH_FIRST_N, EMBEDDINGS_FILE,
+                     SEMANTIC_SEARCH_MIN_SIMILARITY)
 
 
 class EmbeddingsClient:
@@ -41,6 +44,44 @@ class EmbeddingsClient:
         magnitude2 = sum(b ** 2 for b in vec2) ** 0.5
         return dot_product / (magnitude1 * magnitude2)
     
-    def semantic_search(self, user_question: str):
-        pass
-        # TODO: Implement semantic search functionality
+    def semantic_search(self, user_question: str) -> list[dict]:
+        
+        with EMBEDDINGS_FILE.open("r", encoding="utf-8") as file:
+            embedded_chunks = json.load(file)
+
+        question_embedding = self.get_embedding(user_question)
+
+        results = []
+
+        for chunk in embedded_chunks:
+            similarity = self.cosine_similarity(question_embedding, chunk["embedding"])
+            #print(similarity)
+
+            if(similarity >= SEMANTIC_SEARCH_MIN_SIMILARITY):
+                results.append(
+                    {
+                        "document_id": chunk["document_id"],
+                        "chunk_index": chunk["chunk_index"],
+                        "similarity": similarity,
+                        "content": chunk["content"]
+                    }
+                )
+
+
+        results.sort(key=lambda result: result["similarity"], reverse=True)
+        return results[:SEMANTIC_SEARCH_FIRST_N]
+
+if __name__ == "__main__":
+    client = EmbeddingsClient()
+
+    results = client.semantic_search(
+        "How do I diagnose a Docker container that will not start?"
+    )
+    print(results)
+
+    for result in results:
+        print("Document:",result["document_id"])
+        print("Chunk:",result["chunk_index"])
+        print("Similarity:",round(result["similarity"], 4))
+        print("Content:",result["content"])
+        print("-" * 50)

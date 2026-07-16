@@ -30,7 +30,12 @@ def main():
 
         response = agent.process_message(user_input)
 
+        tokens_usage = context.get_tokens_usage()
+
         print(f"\nDevOpescu: {response}")
+        print(f"Input tokens total {tokens_usage["input_tokens"]}")
+        print(f"Output tokens total {tokens_usage["output_tokens"]}")
+        print(f"Total cost estimat: ${tokens_usage['total_cost']:.6f}")
 
 
 if __name__ == "__main__":

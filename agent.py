@@ -35,12 +35,20 @@ class Agent:
             "content": user_message
         })
 
+        messages = self.context.get_history()
+
+        self.context.update_input_tokens(messages)
+
+
         response = self.llm_client.generate_response(
-            self.context.get_history(),
+            messages,
             tools=list(self.tools.values())
         )
 
         message = response["message"]
+
+        self.context.update_output_tokens(message)
+
         tool_calls = message.get("tool_calls", [])
 
         if tool_calls:
@@ -50,10 +58,17 @@ class Agent:
             for result in tool_results:
                 self.context.add_message(result)
 
+            messages = self.context.get_history()
+
+            self.context.update_input_tokens(messages)
+
             response = self.llm_client.generate_response(
                 self.context.get_history()
             )
+
             message = response["message"]
+
+            self.context.update_output_tokens(message)
 
         self.context.add_message(message)
         return message.get("content", "")

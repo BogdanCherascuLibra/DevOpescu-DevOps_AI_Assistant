@@ -10,5 +10,11 @@
         "name": "Service troubleshooting",
         "description": "Steps for diagnosing service problems",
         "always_load": true
+    },
+    {
+        "id": "emplayee_handbook",
+        "name": "Test",
+        "description": "Testing chunking",
+        "always_load": false
     }
 ]
