@@ -1,0 +1,73 @@
+X Agent cu personalitate proprie
+X Conversation Context
+X Dynamic System Prompt
+X Knowledge Base (Prompts, Facts, Procedures)
+X Registries pentru Facts și Procedures
+X Chunking
+X Embeddings Generation
+X Semantic Search
+X Retrieval-based Context Injection
+X Token Usage Tracking
+X Cost Estimation
+
+X Context Recycling / Context Compression (2p)
+   Gestionarea inteligentă a contextului atunci când se apropie limita de tokeni.
+X Cost Optimization (2p)
+   Reducerea dimensiunii prompturilor și încărcarea doar a informațiilor relevante.
+X Robust Error Handling (2p)
+   Tratarea elegantă a erorilor de rețea, API și fișiere lipsă.
+X Fallback Strategy (2p)
+   Comportament alternativ atunci când modelul nu poate răspunde sau Retrieval-ul nu găsește informații relevante.
+□ Scalability & Extensibility (2p)
+   Arhitectură care permite adăugarea facilă de tool-uri, facts și procedures.
+□ Code Quality (2p)
+   Correctness, Robustness, Clarity și Readability.
+   Cod pregătit pentru Code Review.
+
+
+
+
+
+Persistence & Sessions
+□ Session Management (2p)
+□ Multiple Conversations per User (2p)
+□ Export / Import Conversation History (1p)
+
+User Interface
+□ Improved CLI Experience (1p)
+□ Colored Terminal UI (1p)
+□ Interactive Menu System (2p)
+□ Minimal Web UI (3p)
+
+Backend & Architecture
+□ HTTP Backend Service (3p)
+□ REST API Endpoints (2p)
+□ Multi-user Support (3p)
+
+AI Features
+□ Extra Tool (1p / tool, max 3p)
+□ Dynamic Tool Discovery (3p)
+□ Parallel Tool Execution (3p)
+NU Multi-step Tool Reasoning (4p)
+
+
+Knowledge & Retrieval
+
+□ Chunk Overlap Strategy (2p)
+□ Retrieval Thresholds & Tuning (2p)
+□ Embedding Cache (2p)
+□ Incremental Re-indexing (3p)
+
+Model Orchestration
+
+□ Multiple Models for Different Tasks (4p)
+□ Dedicated Embedding Model + Chat Model (2p)
+NU Automatic Model Selection (4p)
+
+Observability
+
+□ Structured Logging (2p)
+□ Performance Metrics (2p)
+□ Prompt / Token Analytics Dashboard (3p)
+
+
