@@ -10,7 +10,7 @@ import json
 from config import (SYSTEM_PROMPT,
                      INPUT_TOKEN_PRICE_PER_MILLION,
                     OUTPUT_TOKEN_PRICE_PER_MILLION,
-                    MAX_HISTORY_MESSAGES,
+                    MAX_CONTEXT_TOKENS,
                     RECENT_MESSAGES_TO_KEEP
                        )
 from pathlib import Path
@@ -134,15 +134,30 @@ class ConversationContext:
             "total_cost": self.get_total_cost()
         }
     def needs_compression(self) -> bool:
-        return len(self.messages) - 1 > MAX_HISTORY_MESSAGES 
+        conversation = self.messages[1:]
+
+        if len(conversation) <= RECENT_MESSAGES_TO_KEEP:
+            return False
+
+        total_tokens = sum(
+            count_tokens(message.get("content", ""))
+            for message in conversation
+            if message.get("content")
+        )
+
+        print(f"Conversation tokens: {total_tokens}/{MAX_CONTEXT_TOKENS}")
+
+        return total_tokens > MAX_CONTEXT_TOKENS 
+    
     def get_messages_to_summarize(self) -> list[dict]:
         conversation = self.messages[1:]
 
         return conversation[:-RECENT_MESSAGES_TO_KEEP]   
     def compress_history(self, summary: str) -> None:
         system_message = self.messages[0]
+        conversation = self.messages[1:]
 
-        recent_messages = self.messages[
+        recent_messages = conversation[
             -RECENT_MESSAGES_TO_KEEP:
         ]
 
@@ -159,4 +174,7 @@ class ConversationContext:
             summary_message,
             *recent_messages
         ]
+
+        print("Contextul a fost comprimat.")
+        print("Număr mesaje după compresie:", len(self.messages))
     
