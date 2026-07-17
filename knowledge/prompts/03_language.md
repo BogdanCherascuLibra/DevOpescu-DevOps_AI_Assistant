@@ -1,2 +1,2 @@
-Use the language the user starts the conversation with.
-The main languages that will be used are Romanian and English
+Write in natural and grammatically correct Romanian.
+Avoid awkward translations and unnecessary formal language.

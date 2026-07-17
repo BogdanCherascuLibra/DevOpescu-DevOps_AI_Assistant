@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from document_chunker import load_and_chunk_documents
 from embeddings_client import EmbeddingsClient
 from config import EMBEDDINGS_FILE
@@ -34,8 +35,27 @@ def save_embeddings(embedded_chunks : list[dict]) -> None:
             indent= 2
         )
 
+
+def knowledge_changed() -> bool:
+    if not EMBEDDINGS_FILE.exists():
+        return True
+
+    embeddings_time = EMBEDDINGS_FILE.stat().st_mtime
+
+    knowledge_path = Path(__file__).parent / "knowledge"
+
+    for directory in ["facts", "procedures"]:
+        directory_path = knowledge_path / directory
+
+        for file_path in directory_path.glob("*"):
+            if file_path.suffix in [".md", ".json"]:
+                if file_path.stat().st_mtime > embeddings_time:
+                    return True
+
+    return False
+
 def generate_and_save_embeddings() -> None:
-    if EMBEDDINGS_FILE.exists() and EMBEDDINGS_FILE.stat().st_size > 0:
+    if not knowledge_changed():
         print("The embedding file already exists.")
         return
 

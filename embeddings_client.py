@@ -8,20 +8,42 @@ from config import (EMBEDDINGS_MODEL, EMBEDDINGS_ENDPOINT,
 
 class EmbeddingsClient:
     def get_embedding(self, text: str) -> list[float]:
-        response = requests.post(
-            EMBEDDINGS_ENDPOINT,
-            json={
-                "model": EMBEDDINGS_MODEL,
-                "input": text
-            }
-        )
+        try:
+            response = requests.post(
+                EMBEDDINGS_ENDPOINT,
+                json={
+                    "model": EMBEDDINGS_MODEL,
+                    "input": text
+                }
+            )
 
-        if not response.ok:
-            print("STATUS:", response.status_code)
-            print("BODY:", response.text)
+            if not response.ok:
+                print("STATUS:", response.status_code)
+                print("BODY:", response.text)
 
-        response.raise_for_status()
-        return response.json()["embeddings"][0]
+            response.raise_for_status()
+
+            return response.json()["embeddings"][0]
+    
+        except requests.Timeout as exc:
+            raise RuntimeError (
+                "Serviciul de embeddings nu a raspuns la timp."
+            ) from exc
+
+        except requests.ConnectionError as exc:
+            raise RuntimeError (
+                "Nu ma pot conecta la Ollama."
+            ) from exc
+
+        except requests.RequestException as error:
+            raise RuntimeError(
+                f"Eroare la serviciul de embeddings: {error}"
+            ) from error
+
+        except (KeyError, IndexError, ValueError) as exc:
+            raise RuntimeError(
+                "Raspuns invalid primit de la serviciul de embeddings."
+            ) from exc
 
     def cosine_similarity(self, vec1: list[float], vec2: list[float]) -> float:
         """
@@ -45,9 +67,23 @@ class EmbeddingsClient:
         return dot_product / (magnitude1 * magnitude2)
     
     def semantic_search(self, user_question: str) -> list[dict]:
-        
-        with EMBEDDINGS_FILE.open("r", encoding="utf-8") as file:
-            embedded_chunks = json.load(file)
+        try:
+
+            with EMBEDDINGS_FILE.open("r", encoding="utf-8") as file:
+                embedded_chunks = json.load(file)
+
+        except FileNotFoundError as exc:
+
+            raise RuntimeError(
+            "Fiierul embeddings.json nu exista."
+            ) from exc
+
+        except json.JSONDecodeError as exc:
+            
+            raise RuntimeError(
+        "Fisierul embeddings.json este corupt."
+            ) from exc
+            
 
         question_embedding = self.get_embedding(user_question)
 

@@ -3,13 +3,13 @@
         "id": "docker_troubleshooting",
         "name": "Docker troubleshooting",
         "description": "Steps for diagnosing docker problems",
-        "always_load": true
+        "always_load": false
     },
     {
         "id": "service_troubleshooting",
         "name": "Service troubleshooting",
         "description": "Steps for diagnosing service problems",
-        "always_load": true
+        "always_load": false
     },
     {
         "id": "emplayee_handbook",

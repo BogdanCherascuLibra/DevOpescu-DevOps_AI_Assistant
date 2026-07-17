@@ -7,7 +7,12 @@ messages exchanged between the user and the AI assistant.
 
 import json
 
-from config import (SYSTEM_PROMPT, INPUT_TOKEN_PRICE_PER_MILLION, OUTPUT_TOKEN_PRICE_PER_MILLION)
+from config import (SYSTEM_PROMPT,
+                     INPUT_TOKEN_PRICE_PER_MILLION,
+                    OUTPUT_TOKEN_PRICE_PER_MILLION,
+                    MAX_HISTORY_MESSAGES,
+                    RECENT_MESSAGES_TO_KEEP
+                       )
 from pathlib import Path
 from utils import count_tokens
 
@@ -68,6 +73,9 @@ class ConversationContext:
 
         if SYSTEM_PROMPT.strip():
             prompt_parts.append(SYSTEM_PROMPT.strip())
+
+        prompt_parts.extend(self.load_prompt_files())
+
         prompt_parts.extend(self.load_registered_documents("facts"))
 
         prompt_parts.extend(self.load_registered_documents("procedures"))
@@ -89,8 +97,8 @@ class ConversationContext:
         for message in messages:
             content = message.get("content")
 
-        if content:
-            self.input_tokens += count_tokens(content)
+            if content:
+                self.input_tokens += count_tokens(content)
 
     # def update_output_tokens(self, messages: list[dict]) -> None:
     #     for message in messages:
@@ -118,11 +126,37 @@ class ConversationContext:
             * OUTPUT_TOKEN_PRICE_PER_MILLION
         )
 
-        return input_cost + output_cost
-    
+        return input_cost + output_cost  
     def get_tokens_usage(self) -> dict:
         return {
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
             "total_cost": self.get_total_cost()
         }
+    def needs_compression(self) -> bool:
+        return len(self.messages) - 1 > MAX_HISTORY_MESSAGES 
+    def get_messages_to_summarize(self) -> list[dict]:
+        conversation = self.messages[1:]
+
+        return conversation[:-RECENT_MESSAGES_TO_KEEP]   
+    def compress_history(self, summary: str) -> None:
+        system_message = self.messages[0]
+
+        recent_messages = self.messages[
+            -RECENT_MESSAGES_TO_KEEP:
+        ]
+
+        summary_message = {
+            "role": "system",
+            "content": (
+                "Summary of the previous conversation:\n"
+                f"{summary}"
+                )
+        }
+
+        self.messages = [
+            system_message,
+            summary_message,
+            *recent_messages
+        ]
+    

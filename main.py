@@ -9,6 +9,7 @@ from agent import Agent
 from llm_client import LLMClient
 from conversation_context import ConversationContext
 from tools.tools import tools
+from embeddings_client import EmbeddingsClient
 
 
 def main():
@@ -16,7 +17,9 @@ def main():
 
     llm_client = LLMClient()
 
-    agent = Agent(llm_client, context, tools=tools)
+    embeddings_client = EmbeddingsClient()
+
+    agent = Agent(llm_client, context, embeddings_client, tools=tools)
 
     print("Salut, sunt DevOpescu, asistentul tau pentru probleme de DevOps, cu ce te pot ajuta ?")
 
