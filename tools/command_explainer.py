@@ -1,8 +1,18 @@
+"""
+Shell command explanation and risk analysis.
+
+This module analyzes a user-provided shell command without executing it.
+It identifies the base command, classifies the operation, detects risky
+patterns, and returns warnings and recommendations.
+"""
+
 import re
 import shlex
 from typing import Any
 
 
+# Commands and argument patterns that may modify the system
+# or cause data loss.
 DANGEROUS_PATTERNS = [
     {
         "pattern": r"\brm\s+.*(?:-rf|-fr)\b",
@@ -10,7 +20,7 @@ DANGEROUS_PATTERNS = [
         "warning": (
             "Recursively and forcibly deletes files or directories. "
             "Deleted data may not be recoverable."
-        )
+        ),
     },
     {
         "pattern": r"\bmkfs(?:\.\w+)?\b",
@@ -18,7 +28,7 @@ DANGEROUS_PATTERNS = [
         "warning": (
             "Creates a new filesystem and may destroy existing data "
             "on the selected device."
-        )
+        ),
     },
     {
         "pattern": r"\bdd\s+.*\bof=/dev/",
@@ -26,47 +36,48 @@ DANGEROUS_PATTERNS = [
         "warning": (
             "Writes raw data directly to a device and may overwrite "
             "the disk."
-        )
+        ),
     },
     {
         "pattern": r"\bshutdown\b|\breboot\b|\bpoweroff\b",
         "risk": "high",
-        "warning": "Stops or restarts the operating system."
+        "warning": "Stops or restarts the operating system.",
     },
     {
         "pattern": r"\bsystemctl\s+(restart|stop|disable|mask)\b",
         "risk": "high",
         "warning": (
             "Changes the state or availability of a system service."
-        )
+        ),
     },
     {
         "pattern": r"\bdocker\s+(rm|rmi|prune|stop|restart|kill)\b",
         "risk": "high",
         "warning": (
             "Stops, removes or modifies Docker resources."
-        )
+        ),
     },
     {
         "pattern": r"\bchmod\s+(777|666)\b",
         "risk": "high",
         "warning": (
             "Grants broad permissions and may create a security risk."
-        )
+        ),
     },
     {
         "pattern": r"\bchown\b",
         "risk": "medium",
-        "warning": "Changes file or directory ownership."
+        "warning": "Changes file or directory ownership.",
     },
     {
         "pattern": r"\bsudo\b",
         "risk": "medium",
-        "warning": "Runs the command with elevated privileges."
-    }
+        "warning": "Runs the command with elevated privileges.",
+    },
 ]
 
 
+# Short descriptions used for common shell and DevOps commands.
 COMMAND_DESCRIPTIONS = {
     "docker": "Manages Docker containers, images, volumes and networks.",
     "systemctl": "Manages systemd services and system state.",
@@ -95,32 +106,41 @@ COMMAND_DESCRIPTIONS = {
     "pip": "Installs and manages Python packages.",
     "pip3": "Installs and manages Python 3 packages.",
     "uvicorn": "Runs an ASGI web application server.",
-    "sudo": "Runs another command with elevated privileges."
+    "sudo": "Runs another command with elevated privileges.",
 }
 
 
 def _detect_risk(command: str) -> tuple[str, list[str]]:
+    """Return the highest detected risk level and related warnings."""
     risk_order = {
         "low": 0,
         "medium": 1,
         "high": 2,
-        "critical": 3
+        "critical": 3,
     }
 
     highest_risk = "low"
     warnings = []
 
     for item in DANGEROUS_PATTERNS:
-        if re.search(item["pattern"], command, re.IGNORECASE):
+        if re.search(
+            item["pattern"],
+            command,
+            re.IGNORECASE,
+        ):
             warnings.append(item["warning"])
 
-            if risk_order[item["risk"]] > risk_order[highest_risk]:
+            if (
+                risk_order[item["risk"]]
+                > risk_order[highest_risk]
+            ):
                 highest_risk = item["risk"]
 
     return highest_risk, warnings
 
 
 def _classify_command(command: str) -> str:
+    """Classify a command as read-only or system-modifying."""
     modification_patterns = [
         r"\brm\b",
         r"\bmv\b",
@@ -132,49 +152,63 @@ def _classify_command(command: str) -> str:
         r"\bsystemctl\s+(restart|stop|start|enable|disable)\b",
         r"\bdocker\s+(rm|rmi|stop|restart|kill|prune)\b",
         r"\bapt\s+(install|remove|upgrade)\b",
-        r"\bpip\d*\s+install\b"
+        r"\bpip\d*\s+install\b",
     ]
 
     for pattern in modification_patterns:
-        if re.search(pattern, command, re.IGNORECASE):
+        if re.search(
+            pattern,
+            command,
+            re.IGNORECASE,
+        ):
             return "system modification"
 
     return "diagnostic or read-only"
 
 
-def explain_shell_command(command: str) -> dict[str, Any]:
-    """Explain a shell command without executing it."""
+def explain_shell_command(
+    command: str,
+) -> dict[str, Any]:
+    """
+    Analyze and explain a shell command without executing it.
 
+    The returned dictionary includes the command description,
+    arguments, operation type, risk level, warnings, and a
+    recommendation.
+    """
     if not command or not command.strip():
         return {
             "status": "error",
-            "message": "The command cannot be empty."
+            "message": "The command cannot be empty.",
         }
 
     if len(command) > 5_000:
         return {
             "status": "error",
-            "message": "The command is too long."
+            "message": "The command is too long.",
         }
 
     command = command.strip()
 
     try:
+        # Parse the command while respecting quoted arguments.
         parts = shlex.split(command)
+
     except ValueError as error:
         return {
             "status": "error",
-            "message": f"Invalid shell syntax: {error}"
+            "message": f"Invalid shell syntax: {error}",
         }
 
     if not parts:
         return {
             "status": "error",
-            "message": "No command was provided."
+            "message": "No command was provided.",
         }
 
     base_command = parts[0]
 
+    # When sudo is used, analyze the command executed after it.
     if base_command == "sudo" and len(parts) > 1:
         analyzed_command = parts[1]
     else:
@@ -182,12 +216,11 @@ def explain_shell_command(command: str) -> dict[str, Any]:
 
     description = COMMAND_DESCRIPTIONS.get(
         analyzed_command,
-        "No predefined description is available for this command."
+        "No predefined description is available for this command.",
     )
 
     risk, warnings = _detect_risk(command)
     command_type = _classify_command(command)
-
     arguments = parts[1:]
 
     return {
@@ -204,5 +237,5 @@ def explain_shell_command(command: str) -> dict[str, Any]:
             "the command. Use a test environment for risky operations."
             if risk in {"high", "critical"}
             else "Verify the command arguments before running it."
-        )
+        ),
     }

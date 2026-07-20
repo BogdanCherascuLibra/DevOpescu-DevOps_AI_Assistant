@@ -1,21 +1,20 @@
+"""
+Utility functions used across the application.
+
+This module currently provides token counting
+for estimating prompt size and API usage.
+"""
+
 import tiktoken
 
+
+_ENCODING_NAME = "cl100k_base"
+
+
 def count_tokens(text: str) -> int:
-    encoding = tiktoken.get_encoding("cl100k_base")
-    tokens = encoding.encode(text)
+    """Return the estimated number of tokens in the provided text."""
+    if not text:
+        return 0
 
-    return len(tokens)
-
-if __name__ == "__main__":
-    test_texts = [
-        "Salut!",
-        "Salut, sunt DevOpescu!",
-        "How do I diagnose a Docker container that will not start?",
-        "",
-        "Docker container logs can be inspected using docker logs."
-    ]
-
-    for text in test_texts:
-        print(f"Text: {text!r}")
-        print(f"Număr tokeni: {count_tokens(text)}")
-        print("-" * 40)    
+    encoding = tiktoken.get_encoding(_ENCODING_NAME)
+    return len(encoding.encode(text))

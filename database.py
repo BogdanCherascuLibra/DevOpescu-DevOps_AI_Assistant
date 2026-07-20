@@ -1,19 +1,36 @@
+"""
+SQLite database configuration and initialization.
+
+This module creates database connections and initializes
+the tables required for users, sessions, conversations,
+messages, and conversation usage statistics.
+"""
+
 import sqlite3
 
 from config import DATABASE_FILE
 
 
 def get_connection() -> sqlite3.Connection:
-    DATABASE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    """Create and return a configured SQLite connection."""
+    # Ensure that the database directory exists.
+    DATABASE_FILE.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
     connection = sqlite3.connect(DATABASE_FILE)
+
+    # Allow database rows to be accessed using column names.
     connection.row_factory = sqlite3.Row
 
     return connection
 
 
 def initialize_database() -> None:
+    """Create the required database tables and usage columns."""
     with get_connection() as connection:
+        # Create the initial database structure.
         connection.executescript(
             """
             CREATE TABLE IF NOT EXISTS users (
@@ -55,13 +72,17 @@ def initialize_database() -> None:
             );
             """
         )
+
+        # Read the existing conversation columns so older databases
+        # can be upgraded without deleting stored data.
         columns = {
-        row["name"]
-        for row in connection.execute(
+            row["name"]
+            for row in connection.execute(
                 "PRAGMA table_info(conversations)"
-        ).fetchall()
+            ).fetchall()
         }
 
+        # Add usage columns when they do not exist yet.
         if "input_tokens" not in columns:
             connection.execute(
                 """

@@ -9,3 +9,4 @@ data/*.db
 *.sqlite
 *.sqlite3
 data/embeddings.json
+exports/*.json

@@ -1,15 +1,24 @@
-import json
+"""
+Conversation persistence management.
+
+This module handles conversation creation, message storage,
+conversation retrieval, deletion, and usage statistics.
+"""
+
 from uuid import uuid4
+
 from database import get_connection
 
 
-
 class ConversationManager:
+    """Manage conversations and their stored messages."""
+
     def create_conversation(
         self,
         user_id: str,
-        title: str = "New conversation"
+        title: str = "New conversation",
     ) -> str:
+        """Create a new conversation and return its generated ID."""
         conversation_id = str(uuid4())
 
         with get_connection() as connection:
@@ -18,7 +27,7 @@ class ConversationManager:
                 INSERT INTO conversations (id, user_id, title)
                 VALUES (?, ?, ?)
                 """,
-                (conversation_id, user_id, title)
+                (conversation_id, user_id, title),
             )
 
         return conversation_id
@@ -27,8 +36,9 @@ class ConversationManager:
         self,
         conversation_id: str,
         role: str,
-        content: str
+        content: str,
     ) -> None:
+        """Store a message and update the conversation timestamp."""
         with get_connection() as connection:
             connection.execute(
                 """
@@ -39,7 +49,7 @@ class ConversationManager:
                 )
                 VALUES (?, ?, ?)
                 """,
-                (conversation_id, role, content)
+                (conversation_id, role, content),
             )
 
             connection.execute(
@@ -48,13 +58,14 @@ class ConversationManager:
                 SET updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
                 """,
-                (conversation_id,)
+                (conversation_id,),
             )
 
     def get_messages(
         self,
-        conversation_id: str
+        conversation_id: str,
     ) -> list[dict]:
+        """Return all messages from a conversation in chronological order."""
         with get_connection() as connection:
             rows = connection.execute(
                 """
@@ -63,15 +74,16 @@ class ConversationManager:
                 WHERE conversation_id = ?
                 ORDER BY id
                 """,
-                (conversation_id,)
+                (conversation_id,),
             ).fetchall()
 
         return [dict(row) for row in rows]
 
     def get_user_conversations(
         self,
-        user_id: str
+        user_id: str,
     ) -> list[dict]:
+        """Return all conversations belonging to a user."""
         with get_connection() as connection:
             rows = connection.execute(
                 """
@@ -80,15 +92,17 @@ class ConversationManager:
                 WHERE user_id = ?
                 ORDER BY updated_at DESC
                 """,
-                (user_id,)
+                (user_id,),
             ).fetchall()
 
         return [dict(row) for row in rows]
-    
-    def get_conversation(self,
-                        conversation_id: str,
-                        user_id: str
-                        ) -> dict | None:
+
+    def get_conversation(
+        self,
+        conversation_id: str,
+        user_id: str,
+    ) -> dict | None:
+        """Return a conversation only when it belongs to the given user."""
         with get_connection() as connection:
             row = connection.execute(
                 """
@@ -96,34 +110,36 @@ class ConversationManager:
                 FROM conversations
                 WHERE id = ? AND user_id = ?
                 """,
-                (conversation_id, user_id)
+                (conversation_id, user_id),
             ).fetchone()
 
         return dict(row) if row else None
-    
+
     def delete_conversation(
         self,
         conversation_id: str,
-        user_id: str
+        user_id: str,
     ) -> bool:
+        """Delete a conversation belonging to a user."""
         with get_connection() as connection:
             cursor = connection.execute(
                 """
-             DELETE FROM conversations
+                DELETE FROM conversations
                 WHERE id = ? AND user_id = ?
                 """,
-                (conversation_id, user_id)
+                (conversation_id, user_id),
             )
 
         return cursor.rowcount > 0
-    
+
     def update_usage(
         self,
         conversation_id: str,
         input_tokens: int,
         output_tokens: int,
-        total_cost: float
-        ) -> None:
+        total_cost: float,
+    ) -> None:
+        """Add token usage and estimated cost to a conversation."""
         with get_connection() as connection:
             connection.execute(
                 """
@@ -138,14 +154,15 @@ class ConversationManager:
                     input_tokens,
                     output_tokens,
                     total_cost,
-                    conversation_id
-                )
+                    conversation_id,
+                ),
             )
-            
+
     def get_usage(
         self,
-        conversation_id: str
+        conversation_id: str,
     ) -> dict:
+        """Return the cumulative usage statistics for a conversation."""
         with get_connection() as connection:
             row = connection.execute(
                 """
@@ -156,14 +173,14 @@ class ConversationManager:
                 FROM conversations
                 WHERE id = ?
                 """,
-                (conversation_id,)
+                (conversation_id,),
             ).fetchone()
 
         if not row:
             return {
                 "input_tokens": 0,
                 "output_tokens": 0,
-                "total_cost": 0.0
+                "total_cost": 0.0,
             }
 
         return dict(row)
