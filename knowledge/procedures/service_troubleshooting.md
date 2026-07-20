@@ -1,36 +1,134 @@
 # Linux service troubleshooting
 
-When a Linux service is not working, follow these steps:
+Use this procedure when a systemd service fails to start, stops unexpectedly, reports errors, or does not provide its expected functionality.
 
-1. Ask for the exact service name.
+## Information to request
 
-2. Check the service status:
+Ask for:
 
-   systemctl status SERVICE_NAME
+- the exact service name;
+- the Linux distribution;
+- whether the system is production;
+- the observed symptom or error;
+- whether restarting the service is allowed.
 
-3. Inspect recent logs:
+Do not ask again for details already provided.
 
-   journalctl -u SERVICE_NAME --since "30 minutes ago"
+## Initial diagnosis
 
-4. Check whether the service process is running:
+Start with no more than three diagnostic steps.
 
-   ps aux | grep SERVICE_NAME
+### 1. Check service status
 
-5. Check whether the expected port is listening:
+```bash
+systemctl status SERVICE_NAME --no-pager
+```
 
-   ss -lntup
+Explain that this shows the service state, recent errors, exit code, and process information.
 
-6. Check available system resources:
+Ask the user to provide the relevant output.
 
-   free -h
-   df -h
+### 2. Inspect recent logs
 
-7. Validate the service configuration before restarting it.
+```bash
+journalctl -u SERVICE_NAME --since "30 minutes ago" --no-pager
+```
 
-8. Restart the service only after identifying a probable cause:
+If the failure happened earlier, adapt the time range.
 
-   sudo systemctl restart SERVICE_NAME
+### 3. Check the service definition
 
-9. Verify the service again after the restart.
+```bash
+systemctl cat SERVICE_NAME
+```
 
-Do not claim that the service is fixed unless the user provides the command output.
+Use this to inspect the command, environment files, dependencies, and overrides.
+
+## Follow-up diagnosis
+
+Choose only checks relevant to the evidence.
+
+### Process state
+
+```bash
+pgrep -a SERVICE_NAME
+```
+
+Do not rely only on:
+
+```bash
+ps aux | grep SERVICE_NAME
+```
+
+because it may also match the grep command.
+
+### Port problems
+
+If the service should listen on a port:
+
+```bash
+ss -lntup
+```
+
+Prefer filtering when the expected port is known:
+
+```bash
+ss -lntup | grep ':PORT'
+```
+
+### Resource problems
+
+```bash
+free -h
+df -h
+```
+
+Use these only when logs suggest memory, disk, or resource exhaustion.
+
+### Configuration problems
+
+Validate configuration before restarting whenever the service provides a validation command.
+
+Examples:
+
+```bash
+nginx -t
+apachectl configtest
+sshd -t
+```
+
+Do not invent a validation command for an unknown service.
+
+### Dependency problems
+
+Check failed dependencies:
+
+```bash
+systemctl list-dependencies SERVICE_NAME
+systemctl --failed
+```
+
+## Corrective actions
+
+Restart only after identifying a probable cause and obtaining permission when the environment is sensitive:
+
+```bash
+sudo systemctl restart SERVICE_NAME
+```
+
+Warn that restarting may cause temporary downtime.
+
+Do not recommend disabling security controls, changing permissions broadly, or deleting service data without explicit justification and confirmation.
+
+## Verification
+
+After corrective action:
+
+```bash
+systemctl status SERVICE_NAME --no-pager
+journalctl -u SERVICE_NAME --since "5 minutes ago" --no-pager
+```
+
+If relevant, verify the expected port or endpoint.
+
+Do not claim the service is fixed unless the user provides evidence confirming normal operation.

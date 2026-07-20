@@ -1,20 +1,32 @@
 [
     {
-        "id": "docker_troubleshooting",
-        "name": "Docker troubleshooting",
-        "description": "Steps for diagnosing docker problems",
-        "always_load": false
+    "id": "docker_troubleshooting",
+    "name": "Docker container troubleshooting",
+    "description": "Diagnosing Docker containers that fail to start, stop unexpectedly, crash, restart repeatedly, or have configuration, volume, network, image, environment variable, or resource problems.",
+    "always_load": false
     },
     {
-        "id": "service_troubleshooting",
-        "name": "Service troubleshooting",
-        "description": "Steps for diagnosing service problems",
-        "always_load": false
+    "id": "service_troubleshooting",
+    "name": "Linux service troubleshooting",
+    "description": "Diagnosing Linux systemd services that fail to start, stop unexpectedly, report errors, do not listen on the expected port, or have configuration, dependency, and resource problems.",
+    "always_load": false
     },
     {
-        "id": "emplayee_handbook",
-        "name": "Test",
-        "description": "Testing chunking",
-        "always_load": false
+    "id": "github_actions_troubleshooting",
+    "name": "GitHub Actions troubleshooting",
+    "description": "Diagnosing GitHub Actions workflow, job, build, test, permission, secret, Docker build, artifact, and deployment failures.",
+    "always_load": false
+    },
+    {
+    "id": "linux_resource_troubleshooting",
+    "name": "Linux resource troubleshooting",
+    "description": "Diagnosing Linux systems with high CPU, memory pressure, swap usage, full disks, inode exhaustion, excessive logs, I/O problems, or slow performance.",
+    "always_load": false
+    },
+    {
+    "id": "network_troubleshooting",
+    "name": "Network troubleshooting",
+    "description": "Diagnosing DNS failures, connection refused errors, timeouts, routing, listening ports, firewalls, TLS issues, HTTP errors, Docker networking, and cloud network access.",
+    "always_load": false
     }
 ]

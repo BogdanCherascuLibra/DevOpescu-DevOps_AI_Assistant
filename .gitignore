@@ -5,3 +5,7 @@ __pycache__/
 *.pyc
 .vscode/
 .idea/
+data/*.db
+*.sqlite
+*.sqlite3
+data/embeddings.json

@@ -32,7 +32,7 @@ SEMANTIC_SEARCH_MIN_SIMILARITY = 0.5
 INPUT_TOKEN_PRICE_PER_MILLION = 2.0
 OUTPUT_TOKEN_PRICE_PER_MILLION = 10.0
 
-MAX_CONTEXT_TOKENS = 4000
+MAX_CONTEXT_TOKENS = 6000
 RECENT_MESSAGES_TO_KEEP = 6
 
 MODEL_ENDPOINT = ("http://localhost:11434/api/chat")
@@ -40,3 +40,6 @@ SYSTEM_PROMPT = ""
 AZURE_ENDPOINT = "https://ai-academy-foundry.services.ai.azure.com/openai/v1"
 MODEL_NAME = "gpt-5-mini"
 API_KEY = os.getenv("API_KEY")
+
+# AZURE_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/openai/"
+# MODEL_NAME = "gemini-2.5-flash"

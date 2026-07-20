@@ -666,3 +666,59 @@ textarea {
         min-height: 46px;
     }
 }
+.message-bubble p {
+    margin: 0 0 12px;
+}
+
+.message-bubble p:last-child {
+    margin-bottom: 0;
+}
+
+.message-bubble ul,
+.message-bubble ol {
+    margin: 10px 0 12px 22px;
+}
+
+.message-bubble li {
+    margin-bottom: 6px;
+}
+
+.message-bubble strong {
+    font-weight: 700;
+}
+
+.message-bubble code {
+    padding: 2px 6px;
+
+    background: #0F172A;
+    border-radius: 6px;
+
+    font-family: Consolas, monospace;
+    font-size: 0.92em;
+}
+
+.message-bubble pre {
+    margin: 12px 0;
+    padding: 14px;
+
+    background: #0F172A;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 10px;
+
+    overflow-x: auto;
+}
+
+.message-bubble pre code {
+    padding: 0;
+    background: transparent;
+}
+
+.message-bubble h1,
+.message-bubble h2,
+.message-bubble h3 {
+    margin: 16px 0 8px;
+}
+
+.message-bubble a {
+    color: #60A5FA;
+}

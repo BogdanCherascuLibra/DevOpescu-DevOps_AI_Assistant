@@ -21,40 +21,46 @@ class Agent:
 
     def _handle_tool_calls(self, tool_calls):
         results = []
+
         for tc in tool_calls:
             tool_name = tc["function"]["name"]
             tool_id = tc["id"]
 
             try:
-                arguments = tc["function"]["arguments"]
+                arguments = json.loads(
+                    tc["function"]["arguments"]
+                )
+
                 tool = self.tools.get(tool_name)
+
                 if not tool:
                     raise ValueError(
-                        f"Tool {tool} not found"
+                        f"Tool '{tool_name}' not found."
                     )
-                else:
-                    result = tool.callback(**arguments)
+
+                result = tool.callback(**arguments)
 
             except json.JSONDecodeError:
                 result = (
-                f"Invalid arguments received for tool '{tool_name}'."
-            )
+                    f"Invalid JSON arguments for tool '{tool_name}'."
+                )
 
             except TypeError as error:
                 result = (
-                f"Invalid parameters for tool '{tool_name}': {error}"
-            )
+                    f"Invalid parameters for tool '{tool_name}': {error}"
+                )
 
             except Exception as error:
                 result = (
-                f"Tool '{tool_name}' failed: {error}"
-            )
-                
+                    f"Tool '{tool_name}' failed: {error}"
+                )
+
             results.append({
                 "role": "tool",
                 "tool_call_id": tool_id,
                 "content": str(result)
             })
+
         return results
     
 

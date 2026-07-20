@@ -178,7 +178,16 @@ function addMessage(role, content) {
         : "DevOpescu";
 
     const text = document.createElement("div");
-    text.textContent = content;
+
+    if (role === "assistant") {
+        const rawHtml = marked.parse(content);
+
+        text.innerHTML = DOMPurify.sanitize(rawHtml, {
+        USE_PROFILES: { html: true }
+            });
+    } else {
+        text.textContent = content;
+    }
 
     bubble.append(roleLabel, text);
     wrapper.appendChild(bubble);

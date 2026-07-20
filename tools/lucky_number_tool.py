@@ -23,18 +23,3 @@ def lucky_number(birth_date):
     
 
 
-lucky_number_tool = Tool(
-    name="lucky_number",
-    description="Generates a lucky number based on the user's birth date and today's date",
-    parameters={
-        "type": "object",
-        "properties": {
-            "birth_date": {
-                "type": "string",
-                "description": "The user's birth date in format DDMMYYYY, e.g. 31121993 for 31/12/1993"
-            }
-        },
-        "required": ["birth_date"]
-    },
-    callback=lucky_number
-)

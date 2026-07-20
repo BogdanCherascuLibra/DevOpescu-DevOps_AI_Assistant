@@ -1,8 +1,8 @@
 [
   {
     "id": "infrastructure",
-    "name": "Infrastructure overview",
-    "description": "General information about servers, containers, CI/CD.",
+    "name": "Project infrastructure context",
+    "description": "Default infrastructure facts: Ubuntu 24.04 development, Ubuntu Server production, Docker deployments, GitHub source control, and GitHub Actions CI/CD.",
     "always_load": true
   }
 ]
