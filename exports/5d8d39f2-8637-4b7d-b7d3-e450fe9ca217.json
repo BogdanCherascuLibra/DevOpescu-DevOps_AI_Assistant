@@ -1,0 +1,31 @@
+{
+  "format_version": 1,
+  "exported_at": "2026-07-20T09:17:08.881607+00:00",
+  "conversation": {
+    "title": "Probleme Docker",
+    "created_at": "2026-07-20 09:13:46",
+    "updated_at": "2026-07-20 09:15:42"
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "salut, am probleme cu docker-ul",
+      "created_at": "2026-07-20 09:14:12"
+    },
+    {
+      "role": "assistant",
+      "content": "Salut — hai să diagnosticăm rapid. Am nevoie de puţină informaţie înainte să continui. Spune, te rog: pe ce host e problema (maşina de dezvoltare sau producţie), foloseşti Docker simplu sau docker-compose, şi numele/ID-ul containerului afectat (dacă ştii)?\n\nÎncepe cu aceste 3 paşi diagnostici (nu sunt distructivi). Rulează comenzi şi pune aici output-urile înainte să propun paşi care schimbă ceva.\n\n1) Verifică starea Docker şi versiunea — ne spune dacă daemon-ul e sus şi ce versiune foloseşti:\n   - Comandă (diagnostic): docker version\n   - Comandă (diagnostic, poate necesita sudo): systemctl status docker\n   Explicaţie: confirmăm că serviciul Docker rulează şi aflăm versiunea pentru eventuale incompatibilităţi.\n\n2) Listează toate containerele şi starea lor — identificăm containerul afectat şi starea (Exited, Restarting, Up):\n   - Comandă (diagnostic): docker ps -a\n   Explicaţie: vedem care containere sunt oprite/repornesc şi ID-urile/numele lor.\n\n3) Verifică jurnalele containerului problematic (înlocuieşte CONTAINER cu nume sau ID din pasul 2). Afișează ultimele 200 linii:\n   - Comandă (diagnostic): docker logs --tail 200 CONTAINER\n   Explicaţie: jurnalele arată erorile aplicaţiei sau motivul pentru care containerul a ieşit.\n\nNu execut niciun pas care ar şterge date sau reporni servicii fără să te anunţ explicit. După ce postezi output-urile de la aceste comenzi, continui cu paşi concreţi (ex.: inspect, verificare volume, statut reţea, sau restart — voi avertiza înainte de orice restart).",
+      "created_at": "2026-07-20 09:14:33"
+    },
+    {
+      "role": "user",
+      "content": "gata am rezolvat mersi te pup",
+      "created_at": "2026-07-20 09:15:27"
+    },
+    {
+      "role": "assistant",
+      "content": "Super, mă bucur că s-a rezolvat — merci pentru anunț și te pup înapoi :)\n\nVrei să facem un scurt post‑mortem ca să prevenim reapariția? Pot să te ghidez sau să cer output‑uri pentru 3 comenzi de verificare (nu sunt distructive):\n\n- docker ps -a — arată toate containerele și starea lor.\n- docker logs --tail 200 CONTAINER — afișează ultimele 200 de linii din logul unui container (înlocuiește CONTAINER cu nume/ID).\n- docker inspect CONTAINER — oferă detalii tehnice (rețea, volume, variabile env).\n\nSpune dacă vrei asta și pe ce host e (dev sau producție) + numele/ID‑ul containerului; altfel, oricând gata să ajut mai departe.",
+      "created_at": "2026-07-20 09:15:42"
+    }
+  ]
+}

@@ -17,7 +17,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_DIR = Path(__file__).parent
-
+DATABASE_FILE = BASE_DIR / "data" / "devopescu.db"
+EXPORTS_DIR = BASE_DIR / "exports"
 
 # MODEL_NAME = "qwen3:8b"
 EMBEDDINGS_MODEL = "bge-m3:latest"

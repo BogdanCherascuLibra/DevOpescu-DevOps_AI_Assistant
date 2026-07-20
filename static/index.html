@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>DevOpescu</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+</head>
+
+<body>
+    <div class="app-layout">
+
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">&gt;_</div>
+
+                <div>
+                    <h1>DevOpescu</h1>
+                    <p>DevOps Assistant</p>
+                </div>
+            </div>
+
+            <div class="username-section">
+                <label for="username-input">
+                    Username
+                </label>
+
+                <div class="username-row">
+                    <input
+                        id="username-input"
+                        type="text"
+                        placeholder="Introdu username-ul"
+                        autocomplete="off"
+                    >
+
+                    <button
+                        id="login-button"
+                        class="primary-button"
+                    >
+                        Intră
+                    </button>
+                </div>
+            </div>
+
+            <button
+                id="new-conversation-button"
+                class="new-conversation-button"
+                disabled
+            >
+                + Conversație nouă
+            </button>
+
+            <div class="sidebar-title">
+                Conversații
+            </div>
+
+            <div
+                id="conversation-list"
+                class="conversation-list"
+            >
+                <p class="empty-list">
+                    Introdu un username pentru a vedea conversațiile.
+                </p>
+            </div>
+
+            <div class="sidebar-actions">
+                <label
+                    for="import-file"
+                    class="secondary-button import-label"
+                >
+                    Import JSON
+                </label>
+
+                <input
+                    id="import-file"
+                    type="file"
+                    accept=".json,application/json"
+                    hidden
+                >
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="chat-header">
+                <div>
+                    <h2 id="conversation-title">
+                        DevOps Assistant
+                    </h2>
+
+                    <p id="conversation-status">
+                        Selectează sau creează o conversație.
+                    </p>
+                </div>
+
+                <div class="header-actions">
+                    <button
+                        id="export-button"
+                        class="secondary-button"
+                        disabled
+                    >
+                        Export
+                    </button>
+
+                    <button
+                        id="delete-button"
+                        class="danger-button"
+                        disabled
+                    >
+                        Șterge
+                    </button>
+                </div>
+            </header>
+
+            <section
+                id="messages-container"
+                class="messages-container"
+            >
+                <div class="welcome-card">
+                    <div class="welcome-icon">&gt;_</div>
+
+                    <h3>Salut, sunt DevOpescu</h3>
+
+                    <p>
+                        Te pot ajuta cu Docker, Linux, servicii,
+                        rețelistică, CI/CD și diagnosticare DevOps.
+                    </p>
+                </div>
+            </section>
+
+            <section class="analytics-bar">
+                <div class="metric">
+                    <span>Input tokens</span>
+                    <strong id="input-tokens">0</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Output tokens</span>
+                    <strong id="output-tokens">0</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Cost estimat</span>
+                    <strong id="total-cost">$0.000000</strong>
+                </div>
+            </section>
+
+            <footer class="message-area">
+                <textarea
+                    id="message-input"
+                    placeholder="Descrie problema ta DevOps..."
+                    rows="1"
+                    disabled
+                ></textarea>
+
+                <button
+                    id="send-button"
+                    class="send-button"
+                    disabled
+                >
+                    Trimite
+                </button>
+            </footer>
+
+        </main>
+    </div>
+
+    <div
+        id="notification"
+        class="notification"
+    ></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

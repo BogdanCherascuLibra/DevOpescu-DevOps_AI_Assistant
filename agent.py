@@ -9,12 +9,14 @@ class Agent:
             self,
             llm_client, 
             context,
-            embeddings_client, 
+            embeddings_client,
+            knowledge_base, 
             tools=None
             ):
         self.llm_client = llm_client
         self.context = context
         self.embeddings_client = embeddings_client
+        self.knowledge_base = knowledge_base
         self.tools = {tool.name: tool for tool in tools} if tools else {}
 
     def _handle_tool_calls(self, tool_calls):
@@ -68,10 +70,10 @@ class Agent:
         for message in self.context.get_history():
             print(message["role"], ":", message.get("content", ""))
             print("-" * 30)
-            
+
         messages = self.context.get_history().copy()
 
-        rag_message = self._build_rag_message(user_message)
+        rag_message = self.knowledge_base.build_context_message(user_message)
 
         if rag_message:
             messages.append(rag_message)
@@ -149,57 +151,6 @@ class Agent:
         self.context.add_message(message)
         return message.get("content", "")
     
-    def _build_rag_message(self, user_message: str) -> dict | None:
-        try:
-
-            results = self.embeddings_client.semantic_search(user_message)
-        except RuntimeError as error:
-            print(f"RAG unavailable: {error}")
-            return {
-                "role": "system",
-                "content": (
-                "The internal knowledge base is temporarily unavailable. "
-                "Answer using your general DevOps knowledge. "
-                "Do not pretend that internal documentation was consulted."
-            )
-        }
-
-        if not results:
-            return {
-                "role": "system",
-                "content": (
-                "No relevant information was found in the internal knowledge base. "
-                "Answer using your general DevOps knowledge. "
-                "If important information is missing, ask the user for details."
-            )
-        }
-
-        context_parts = []
-
-        print("\nRAG RESULTS:")
-        for result in results:
-            print(
-                result["document_id"],
-                round(result["similarity"], 4)
-            )
-
-        for result in results:
-            context_parts.append(
-                f"Document: {result['document_id']}\n"
-                f"Content:\n{result['content']}"
-            )
-
-        rag_context = "\n\n---\n\n".join(context_parts)
-
-        return {
-            "role": "system",
-            "content": (
-                "Use the following internal knowledge when relevant.\n"
-                "You may also use your general knowledge.\n"
-                "Do not invent information from these documents.\n\n"
-                f"{rag_context}"
-            )
-        }
     
     def _compress_context_if_needed(self) -> None:
         if not self.context.needs_compression():
